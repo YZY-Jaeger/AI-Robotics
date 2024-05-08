@@ -26,8 +26,10 @@ class Robot:
             #print("The robot is already at the leftmost position.")
 
         print(f"Last state: {self.last_color}, Action taken: {self.last_move}, Result color: {self.platform[self.position]}")
-    
-    
+        print(f"|-----------------|")
+        print(f"|  BOT  ||        |")
+        print(f"| White || Black  |")
+        print(f"****************************************************************************")
     def move_right(self):
         if self.position < len(self.platform) - 1:
             self.histograms[(self.platform[self.position], 'right')][self.platform[self.position + 1]] += 1
@@ -40,6 +42,11 @@ class Robot:
             self.last_move = 'right'
             #print("The robot is already at the rightmost position.")
         print(f"Last state: {self.last_color}, Action taken: {self.last_move}, Result color: {self.platform[self.position]}")
+        print(f"|-----------------|")
+        print(f"|       ||   BOT  |")
+        print(f"| White || Black  |")
+        print(f"****************************************************************************")
+
 
     def report_position(self):
         print(f"The robot is on the {self.platform[self.position]} side of the platform.")
@@ -47,12 +54,6 @@ class Robot:
             print(f"The last color was {self.last_color}.")
         if self.last_move:
             print(f"The last move was {self.last_move}.")
-
-    def calculate_probability(self, next_color, current_color, action):
-        histogram = self.histograms[(current_color, action)]
-        numerator = histogram[next_color]
-        denominator = sum(histogram.values())
-        return numerator / denominator if denominator != 0 else 0
     
     def print_histograms(self):
         for (current_color, action), histogram in self.histograms.items():
@@ -61,17 +62,23 @@ class Robot:
                 print(f"  {next_color}: {count}")
 
     def choose_action(self, current_color):
-        # Calculate probabilities for both actions
-        prob_left = self.calculate_probability('white', current_color, 'left')
-        prob_right = self.calculate_probability('white', current_color, 'right')
+        # Get counts for both colors for both actions
+        count_left_white = self.histograms[(current_color, 'left')]['white']
+        count_right_white = self.histograms[(current_color, 'right')]['white']
+        count_left_black = self.histograms[(current_color, 'left')]['black']
+        count_right_black = self.histograms[(current_color, 'right')]['black']
 
-        # Choose action with higher probability, or randomly if probabilities are equal
-        if prob_left > prob_right:
+        # Determine the color with the highest count and its corresponding action
+        max_count = max(count_left_white, count_right_white, count_left_black, count_right_black)
+        if (count_left_white + count_right_white) == (count_left_black + count_right_black):
+            return random.choice(['left', 'right'])
+        elif max_count == count_left_white or max_count == count_left_black:
             return 'left'
-        elif prob_right > prob_left:
+        elif max_count == count_right_white or max_count == count_right_black:
             return 'right'
         else:
             return random.choice(['left', 'right'])
+    
 # Test the Robot class
 robot = Robot()
 for i in range(10):
@@ -82,5 +89,4 @@ for i in range(10):
     else:
         robot.move_right()
 
-print(robot.calculate_probability('white', 'black', 'right'))  # P(st+1 = white|st = black, at = right)
 robot.print_histograms()
