@@ -1,5 +1,5 @@
 from collections import defaultdict
-
+import random
 class Robot:
     def __init__(self):
         self.platform = ['white', 'black']
@@ -23,7 +23,7 @@ class Robot:
             self.histograms[(self.platform[self.position], 'left')][self.platform[self.position]] += 1
             self.last_color = self.platform[self.position]
             self.last_move = 'left'
-            print("The robot is already at the leftmost position.")
+            #print("The robot is already at the leftmost position.")
 
     def move_right(self):
         if self.position < len(self.platform) - 1:
@@ -35,7 +35,7 @@ class Robot:
             self.histograms[(self.platform[self.position], 'right')][self.platform[self.position]] += 1
             self.last_color = self.platform[self.position]
             self.last_move = 'right'
-            print("The robot is already at the rightmost position.")
+            #print("The robot is already at the rightmost position.")
 
     def report_position(self):
         print(f"The robot is on the {self.platform[self.position]} side of the platform.")
@@ -55,16 +55,28 @@ class Robot:
             print(f"Histogram for {current_color} tile + action {action}:")
             for next_color, count in histogram.items():
                 print(f"  {next_color}: {count}")
-# Usage
+
+    def choose_action(self, current_color):
+        # Calculate probabilities for both actions
+        prob_left = self.calculate_probability('white', current_color, 'left')
+        prob_right = self.calculate_probability('white', current_color, 'right')
+
+        # Choose action with higher probability, or randomly if probabilities are equal
+        if prob_left > prob_right:
+            return 'left'
+        elif prob_right > prob_left:
+            return 'right'
+        else:
+            return random.choice(['left', 'right'])
+# Test the Robot class
 robot = Robot()
-robot.move_right()
-robot.move_left()
-robot.move_left()
-robot.move_right()
-robot.move_right()
-robot.move_left()
-robot.move_right()
-robot.move_left()
-robot.move_left()
+for i in range(10):
+    current_color = robot.platform[robot.position]
+    action = robot.choose_action(current_color)
+    if action == 'left':
+        robot.move_left()
+    else:
+        robot.move_right()
+
 print(robot.calculate_probability('white', 'black', 'right'))  # P(st+1 = white|st = black, at = right)
 robot.print_histograms()
