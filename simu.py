@@ -25,6 +25,9 @@ class Robot:
             self.last_move = 'left'
             #print("The robot is already at the leftmost position.")
 
+        print(f"Last state: {self.last_color}, Action taken: {self.last_move}, Result color: {self.platform[self.position]}")
+    
+    
     def move_right(self):
         if self.position < len(self.platform) - 1:
             self.histograms[(self.platform[self.position], 'right')][self.platform[self.position + 1]] += 1
@@ -36,6 +39,7 @@ class Robot:
             self.last_color = self.platform[self.position]
             self.last_move = 'right'
             #print("The robot is already at the rightmost position.")
+        print(f"Last state: {self.last_color}, Action taken: {self.last_move}, Result color: {self.platform[self.position]}")
 
     def report_position(self):
         print(f"The robot is on the {self.platform[self.position]} side of the platform.")
